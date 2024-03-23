@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel='stylesheet' type='text/css' media='screen' href='https://yarnpkg.com/en/package/normalize.css'>
+	<link rel='stylesheet' type='text/css' media='screen' href='https://unpkg.com/sakura.css/css/sakura-dark.css'>
+		<script src="./bird.js"></script>
+		<style>
+			.row{
+				display: flex;
+				flex-direction: row;
+			}
+			.row>*{margin:auto;}
+			.column{
+				display: flex;
+				flex-direction: column;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="column">
+			<h2>Usabled Slots</h2>
+			<input slot="value_1" placeholder="slots.value_1">
+			<slot name="value_1">slots.value_1</slot>
+			<input slot="value_1" type="number" placeholder="slots.value_1 (as Number)">
+			<slot name="value_1">slots.value_1</slot>
+			<h2>Usabled Template</h2>
+			<button onclick="
+				var item = templates.item();
+				names.append(item.label);
+				items.append(item.value);
+			">Add Item</button>
+		</div>
+		<template name="item" slot="items">
+			<p id="label" ><slot name="name">get value 1</slot></p>
+			<input id="value" slot="name" placeholder="name for this item">
+		</template>
+		<div class="row">
+			<aside id="names" class="column"></aside>
+			<div id="items" class="column"> </div>
+		</div>
+		<h2>Slot Attribute Support</h2>
+		<input slot="value_2" placeholder="slots.value_2">
+		<select slot="value_2" >
+			<option value="1">One</option>
+			<option value="2">Two</option>
+		</select>
+		<textarea slot="value_2" ></textarea>
+		<slot name="value_2">slots.value_1</slot>
+		<progress slot="value_2" max="100"></progress>
+		<h2>New "slotupdate" Event</h2>
+		<p>This is aviabled only if has a trigger element</p>
+		<p>event.element : 
+			<slot name="event_e"></slot>
+			this is the trigger element 
+		</p>
+		<p>event.slotName : 
+			<slot name="event_n"></slot>
+			this is the slot name
+		</p>
+		<p>event.slotValue : 
+			<slot name="event_v"></slot>
+			this is the slot value
+		</p>
+		<script>
+			window.addEventListener("slotupdate",(ev)=>{
+				console.log(ev)
+				if(ev.element){
+					slots.event_e = ev.element
+					slots.event_n = ev.slotName
+					slots.event_v = ev.slotValue
+				}
+			})
+		</script>
+		<h2>Better Fetch (replace AJAX) and File to ObjectURL</h2>
+		<input type="file" onchange="fetch(this.files[0].createObjectURL()).then(x=>x.json()).then(x=>slots.file1 = x)" />
+		<textarea slot="file1" ></textarea>
+		<h2>Easier BackEnd Connection with WebService</h2>
+		<label>Enter a name :</label>
+		<input slot="name" placeholder="slots.name" onchange="ws.post(this.value)">
+		<slot name="age"></slot>
+		<script>
+			var ws = new WebService("https://api.agify.io/?name=")
+			ws.addEventListener('message',({message})=>{
+				slots.age = `I think ${slots.name}'s age is ${message.age}`
+			})
+		</script>
+		<h2>CSSable alerts,confirms,prompts</h2>
+		<button onclick="alert('Hello World')">alert("Hello World")</button>
+		<button onclick="confirm('Paris is Capital of France').then(x=>alert(`${!x},Paris is Capital of France`))">confirm("Paris is Capital of France")</button>
+		<button onclick="prompt('How many time did you play minecraft ?')">prompt("How many time did you play minecraft ?")</button>
+	</body>
+</html>
